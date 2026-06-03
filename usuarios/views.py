@@ -60,8 +60,8 @@ def registro_view(request):
             username=username,
             email=email,
             password=password,
-            documento=documento,
-            telefono=telefono,
+            documento=documento if documento else None,
+            telefono=telefono if telefono else None,
             rol=rol
         )
         messages.success(request, 'Usuario registrado correctamente.')
