@@ -1,41 +1,51 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Catálogo de Libros</h2>
-<form method="GET" class="d-flex gap-2 mb-4">
-    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Buscar por título o autor...">
-    <button type="submit" class="btn btn-dark">Buscar</button>
-</form>
 
-{% if libros_api %}
-    <h5>Resultados de la búsqueda:</h5>
-    <div class="row">
-        {% for libro in libros_api %}
-        <div class="col-md-4 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h6 class="card-title">{{ libro.titulo }}</h6>
-                    <p class="card-text text-muted">{{ libro.autor }}</p>
-                    {% if libro.categoria %}<small>{{ libro.categoria }}</small>{% endif %}
-                    {% if user.rol == 'administrador' %}
-                    <form method="POST" action="{% url 'agregar_libro' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="api_id" value="{{ libro.api_id }}">
-                        <input type="hidden" name="titulo" value="{{ libro.titulo }}">
-                        <input type="hidden" name="autor" value="{{ libro.autor }}">
-                        <input type="hidden" name="isbn" value="{{ libro.isbn }}">
-                        <input type="hidden" name="categoria" value="{{ libro.categoria }}">
-                        <button type="submit" class="btn btn-sm btn-success mt-2">Agregar al catálogo</button>
-                    </form>
-                    {% endif %}
+{% if user.rol == 'administrador' %}
+    <h5>Buscar libros en la API para agregar al catálogo:</h5>
+    <form method="GET" class="d-flex gap-2 mb-4">
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Buscar por título o autor en Open Library...">
+        <button type="submit" class="btn btn-dark">Buscar en API</button>
+    </form>
+
+    {% if libros_api %}
+        <h6>Resultados de la API:</h6>
+        <div class="row mb-4">
+            {% for libro in libros_api %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ libro.titulo }}</h6>
+                        <p class="card-text text-muted">{{ libro.autor }}</p>
+                        {% if libro.categoria %}<small>{{ libro.categoria }}</small>{% endif %}
+                        <form method="POST" action="{% url 'agregar_libro' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="api_id" value="{{ libro.api_id }}">
+                            <input type="hidden" name="titulo" value="{{ libro.titulo }}">
+                            <input type="hidden" name="autor" value="{{ libro.autor }}">
+                            <input type="hidden" name="isbn" value="{{ libro.isbn }}">
+                            <input type="hidden" name="categoria" value="{{ libro.categoria }}">
+                            <button type="submit" class="btn btn-sm btn-success mt-2">Agregar al catálogo</button>
+                        </form>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+    {% endif %}
 {% endif %}
 
 <hr>
-<h5>Libros en el catálogo:</h5>
+<h5>Libros disponibles en el catálogo:</h5>
+
+{% if user.rol == 'lector' %}
+<form method="GET" class="d-flex gap-2 mb-3">
+    <input type="text" name="buscar" value="{{ buscar }}" class="form-control" placeholder="Buscar en el catálogo...">
+    <button type="submit" class="btn btn-dark">Buscar</button>
+</form>
+{% endif %}
+
 <table class="table table-striped">
     <thead>
         <tr>

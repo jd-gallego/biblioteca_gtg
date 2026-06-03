@@ -7,15 +7,22 @@ from .services import LibroService
 @login_required
 def catalogo_libros(request):
     query = request.GET.get('q', '')
+    buscar = request.GET.get('buscar', '')
     libros_api = []
-    if query:
+
+    if query and request.user.es_administrador():
         service = LibroService()
         libros_api = service.buscar_libros(query)
+
     libros_db = Libro.objects.all()
+    if buscar:
+        libros_db = libros_db.filter(titulo__icontains=buscar) | libros_db.filter(autor__icontains=buscar)
+
     return render(request, 'libros/catalogo.html', {
         'libros_api': libros_api,
         'libros_db': libros_db,
-        'query': query
+        'query': query,
+        'buscar': buscar
     })
 
 @login_required
