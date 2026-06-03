@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Catálogo de Libros</h2>
+<form method="GET" class="d-flex gap-2 mb-4">
+    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Buscar por título o autor...">
+    <button type="submit" class="btn btn-dark">Buscar</button>
+</form>
+
+{% if libros_api %}
+    <h5>Resultados de la búsqueda:</h5>
+    <div class="row">
+        {% for libro in libros_api %}
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-title">{{ libro.titulo }}</h6>
+                    <p class="card-text text-muted">{{ libro.autor }}</p>
+                    {% if libro.categoria %}<small>{{ libro.categoria }}</small>{% endif %}
+                    {% if user.rol == 'administrador' %}
+                    <form method="POST" action="{% url 'agregar_libro' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="api_id" value="{{ libro.api_id }}">
+                        <input type="hidden" name="titulo" value="{{ libro.titulo }}">
+                        <input type="hidden" name="autor" value="{{ libro.autor }}">
+                        <input type="hidden" name="isbn" value="{{ libro.isbn }}">
+                        <input type="hidden" name="categoria" value="{{ libro.categoria }}">
+                        <button type="submit" class="btn btn-sm btn-success mt-2">Agregar al catálogo</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<hr>
+<h5>Libros en el catálogo:</h5>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Título</th><th>Autor</th><th>Categoría</th><th>Estado</th><th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for libro in libros_db %}
+        <tr>
+            <td>{{ libro.titulo }}</td>
+            <td>{{ libro.autor }}</td>
+            <td>{{ libro.categoria }}</td>
+            <td>{% if libro.disponible %}<span class="badge bg-success">Disponible</span>{% else %}<span class="badge bg-danger">Prestado</span>{% endif %}</td>
+            <td>
+                {% if libro.disponible and user.rol == 'lector' %}
+                <a href="{% url 'solicitar_prestamo' libro.id %}" class="btn btn-sm btn-primary">Prestar</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

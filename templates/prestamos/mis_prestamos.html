@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Mis Préstamos</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Libro</th><th>Fecha préstamo</th><th>Fecha límite</th><th>Estado</th><th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for prestamo in prestamos %}
+        <tr>
+            <td>{{ prestamo.libro.titulo }}</td>
+            <td>{{ prestamo.fecha_prestamo|date:"d/m/Y" }}</td>
+            <td>{{ prestamo.fecha_limite|date:"d/m/Y" }}</td>
+            <td>{{ prestamo.estado }}</td>
+            <td>
+                {% if prestamo.estado == 'activo' %}
+                <a href="{% url 'devolver_libro' prestamo.id %}" class="btn btn-sm btn-warning">Devolver</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
