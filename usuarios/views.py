@@ -67,3 +67,17 @@ def registro_view(request):
         messages.success(request, 'Usuario registrado correctamente.')
         return redirect('login')
     return render(request, 'usuarios/registro.html')
+
+@login_required
+def toggle_usuario(request, usuario_id):
+    if not request.user.es_administrador():
+        return redirect('catalogo_libros')
+    try:
+        usuario = Usuario.objects.get(id=usuario_id)
+        usuario.activo = not usuario.activo
+        usuario.save()
+        estado = 'activado' if usuario.activo else 'desactivado'
+        messages.success(request, f'Usuario {usuario.username} {estado} correctamente.')
+    except Usuario.DoesNotExist:
+        messages.error(request, 'Usuario no encontrado.')
+    return redirect('admin_dashboard')

@@ -2,7 +2,10 @@
 {% block content %}
 <h2>Panel de Administración</h2>
 <hr>
-<h4>Usuarios registrados</h4>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Usuarios registrados</h4>
+    <a href="{% url 'todos_prestamos' %}" class="btn btn-dark">Ver todos los préstamos</a>
+</div>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -10,6 +13,7 @@
             <th>Correo</th>
             <th>Rol</th>
             <th>Estado</th>
+            <th>Acción</th>
         </tr>
     </thead>
     <tbody>
@@ -18,7 +22,14 @@
             <td>{{ u.username }}</td>
             <td>{{ u.email }}</td>
             <td>{{ u.rol }}</td>
-            <td>{% if u.activo %}Activo{% else %}Inactivo{% endif %}</td>
+            <td>{% if u.activo %}<span class="badge bg-success">Activo</span>{% else %}<span class="badge bg-danger">Inactivo</span>{% endif %}</td>
+            <td>
+                {% if u.username != request.user.username %}
+                <a href="{% url 'toggle_usuario' u.id %}" class="btn btn-sm {% if u.activo %}btn-warning{% else %}btn-success{% endif %}">
+                    {% if u.activo %}Desactivar{% else %}Activar{% endif %}
+                </a>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
