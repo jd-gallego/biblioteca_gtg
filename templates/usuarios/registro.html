@@ -27,6 +27,17 @@
                         <label class="form-label">Teléfono</label>
                         <input type="text" name="telefono" class="form-control">
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol</label>
+                        <select name="rol" class="form-select" id="rolSelect">
+                            <option value="lector">Usuario</option>
+                            <option value="administrador">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="claveAdminDiv" style="display:none;">
+                        <label class="form-label">Clave del sistema <span class="text-danger">*</span></label>
+                        <input type="password" name="clave_admin" class="form-control" placeholder="Solo para administradores">
+                    </div>
                     <button type="submit" class="btn btn-dark w-100">Registrarse</button>
                 </form>
                 <hr>
@@ -35,4 +46,10 @@
         </div>
     </div>
 </div>
+<script>
+    document.getElementById('rolSelect').addEventListener('change', function() {
+        const claveDiv = document.getElementById('claveAdminDiv');
+        claveDiv.style.display = this.value === 'administrador' ? 'block' : 'none';
+    });
+</script>
 {% endblock %}

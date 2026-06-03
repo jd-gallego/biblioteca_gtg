@@ -32,6 +32,8 @@ def admin_dashboard(request):
     usuarios = Usuario.objects.all()
     return render(request, 'usuarios/admin_dashboard.html', {'usuarios': usuarios})
 
+CLAVE_ADMIN = "biblioteca2026"
+
 def registro_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -39,19 +41,28 @@ def registro_view(request):
         password = request.POST.get('password')
         documento = request.POST.get('documento')
         telefono = request.POST.get('telefono')
+        rol = request.POST.get('rol', 'lector')
+        clave_admin = request.POST.get('clave_admin', '')
+
+        if rol == 'administrador' and clave_admin != CLAVE_ADMIN:
+            messages.error(request, 'La clave de administrador es incorrecta.')
+            return render(request, 'usuarios/registro.html')
+
         if Usuario.objects.filter(username=username).exists():
             messages.error(request, 'El usuario ya existe.')
             return render(request, 'usuarios/registro.html')
+
         if Usuario.objects.filter(email=email).exists():
             messages.error(request, 'El correo ya está registrado.')
             return render(request, 'usuarios/registro.html')
+
         usuario = Usuario.objects.create_user(
             username=username,
             email=email,
             password=password,
             documento=documento,
             telefono=telefono,
-            rol='lector'
+            rol=rol
         )
         messages.success(request, 'Usuario registrado correctamente.')
         return redirect('login')
